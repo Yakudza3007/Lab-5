@@ -23,3 +23,4 @@ C:\Users\yakun\RiderProjects\ConsoleApp3\Lab5\obj\Debug\net10.0\Lab5.pdb
 C:\Users\yakun\RiderProjects\ConsoleApp3\Lab5\obj\Debug\net10.0\Lab5.genruntimeconfig.cache
 C:\Users\yakun\RiderProjects\ConsoleApp3\Lab5\obj\Debug\net10.0\ref\Lab5.dll
 C:\Users\yakun\RiderProjects\ConsoleApp3\Lab5\bin\Debug\net10.0\LR5-var14.xlsx
+C:\Users\yakun\RiderProjects\ConsoleApp3\Lab5\obj\Debug\net10.0\Lab5.sourcelink.json

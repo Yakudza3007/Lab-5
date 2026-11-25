@@ -9,7 +9,8 @@ namespace ConsoleApp1
         private static void Main(string[] args)
         {
             Checked c = new Checked();
-            ExcelManager excel = new ExcelManager("LR5-var14.xlsx");
+            ExcelManager excel = 
+                new ExcelManager("LR5-var14.xlsx");
             DatabaseManager db = new DatabaseManager();
             
             bool isRunning = true;
@@ -21,59 +22,14 @@ namespace ConsoleApp1
             try
             {
                 films = excel.ReadFilms();
+                dirs = excel.ReadDirectors();
+                genres = excel.ReadGenres();
             }
             catch (Exception ex)
             {
                 Console.WriteLine("Ошибка: " + ex.Message);
                 return;
             }
-
-            dirs.Add(new Director(1, "Мартин Скорсезе", "США"));
-            dirs.Add(new Director(2, "Уэс Андерсон", "США"));
-            dirs.Add(new Director(3, "Клинт Иствуд", "США"));
-            dirs.Add(new Director(4, "Квентин Тарантино", "США"));
-            dirs.Add(new Director(5, "Дени Вильнёв", "Канада"));
-            dirs.Add(new Director(6, "Даррен Аронофски", "США"));
-            dirs.Add(new Director(7, "Ларс Фон Триер", "Дания"));
-            dirs.Add(new Director(8, "Стивен Спилберг", "США"));
-            dirs.Add(new Director(9, "Ридли Скотт", 
-                "Великобритания"));
-            dirs.Add(new Director(10, "Паоло Соррентино", 
-                "Италия"));
-            dirs.Add(new Director(11, "Андрей Звягинцев", 
-                "Россия"));
-            dirs.Add(new Director(12, "Андрей Тарковский", "СССР"));
-            dirs.Add(new Director(13, "Сергей Эйзенштейн", 
-                "СССР"));
-            dirs.Add(new Director(14, "Стэнли Кубрик", "США"));
-            dirs.Add(new Director(15, "Кристофер Нолан", 
-                "Великобритания"));
-            dirs.Add(new Director(16, "Дэвид Финчер", "США"));
-            dirs.Add(new Director(17, "Фрэнк Капра", "Италия"));
-            dirs.Add(new Director(18, "Пон Джун-хо", 
-                "Южная Корея"));
-            dirs.Add(new Director(19, "Альфред Хичкок", 
-                "Великобритания"));
-            dirs.Add(new Director(20, "Алексей Балабанов", 
-                "Россия"));
-            dirs.Add(new Director(21, "Хлоя Чжао", "Китай"));
-            dirs.Add(new Director(22, "Тони Кэй", 
-                "Великобритания"));
-            dirs.Add(new Director(23, "Роберт Земекис", "США"));
-
-            genres.Add(new Genre(1, "Триллер"));
-            genres.Add(new Genre(2, "Комедия"));
-            genres.Add(new Genre(3, "Драма"));
-            genres.Add(new Genre(4, "Криминал"));
-            genres.Add(new Genre(5, "Мелодрама"));
-            genres.Add(new Genre(6, "Мультфильм"));
-            genres.Add(new Genre(7, "Вестерн"));
-            genres.Add(new Genre(8, "Боевик"));
-            genres.Add(new Genre(9, "Фантастика"));
-            genres.Add(new Genre(10, "Ужас"));
-            genres.Add(new Genre(11, "Приключения"));
-            genres.Add(new Genre(12, "Исторический"));
-            genres.Add(new Genre(13, "Детектив"));
 
             db.SetData(films, dirs, genres);
 
@@ -117,10 +73,10 @@ namespace ConsoleApp1
 
         private static void ShowData(List<Film> films)
         {
-            int i = 0;
-            for (i = 0; i < films.Count; i++)
+            int index = 0;
+            for (index = 0; index < films.Count; index++)
             {
-                Console.WriteLine(films[i]);
+                Console.WriteLine(films[index]);
             }
         }
 
@@ -137,36 +93,40 @@ namespace ConsoleApp1
             decimal box = 0;
             Director foundDir = null;
             Genre foundGen = null;
+            int newId = 0;
 
-            id = c.ReadInt("Введите ID: ");
+            id = c.ReadInt("Введите ID фильма: ");
             title = c.ReadString("Введите название: ");
             
             dirName = c.ReadString("Введите имя режиссера: ");
-            var findDir = from d in dirs
-                          where d.Name.ToLower() == 
-                                dirName.ToLower()
-                          select d;
-            foundDir = findDir.FirstOrDefault();
+            
+            foundDir = dirs.FirstOrDefault(d => 
+                d.Name.ToLower() == dirName.ToLower());
 
             if (foundDir == null)
             {
-                Console.WriteLine("Ошибка: такого режиссера нет.");
-                return;
+                newId = dirs.Max(d => d.Id) + 1;
+                foundDir = new Director(
+                    newId, dirName, "Неизвестно");
+                dirs.Add(foundDir);
+                Console.WriteLine(
+                    $"Режиссер добавлен. ID = {newId}");
             }
 
             year = c.ReadInt("Введите год: ");
 
             genName = c.ReadString("Введите название жанра: ");
-            var findGen = from g in genres
-                          where g.Name.ToLower() == 
-                                genName.ToLower()
-                          select g;
-            foundGen = findGen.FirstOrDefault();
+            
+            foundGen = genres.FirstOrDefault(g => 
+                g.Name.ToLower() == genName.ToLower());
 
             if (foundGen == null)
             {
-                Console.WriteLine("Ошибка: такого жанра нет.");
-                return;
+                newId = genres.Max(g => g.Id) + 1;
+                foundGen = new Genre(newId, genName);
+                genres.Add(foundGen);
+                Console.WriteLine(
+                    $"Жанр добавлен. ID = {newId}");
             }
 
             dur = c.ReadInt("Введите длительность: ");
@@ -176,7 +136,7 @@ namespace ConsoleApp1
             films.Add(new Film(id, title, foundDir.Id, year, 
                 foundGen.Id, dur, bud, box));
                 
-            Console.WriteLine("Фильм успешно добавлен.");
+            Console.WriteLine("Фильм успешно добавлен!");
         }
 
         private static void DeleteFilm(Checked c, List<Film> films)
@@ -192,26 +152,28 @@ namespace ConsoleApp1
 
         private static void RunQueries(DatabaseManager db)
         {
-            Console.WriteLine("\nЗапрос 1 (После 2000 г. > 2 часов):");
-            List<Film> q1 = db.Query1();
-            int i = 0;
-            for (i = 0; i < q1.Count; i++)
+            List<Film> q1 = new List<Film>();
+            List<string> q3 = new List<string>();
+            int index = 0;
+
+            Console.WriteLine("\nЗапрос 1 (После 2000 г. > 2ч):");
+            q1 = db.Query1();
+            for (index = 0; index < q1.Count; index++)
             {
-                Console.WriteLine(q1[i]);
+                Console.WriteLine(q1[index]);
             }
 
-            Console.WriteLine("\nЗапрос 2 (Сборы реж. ID=1):");
-            Console.WriteLine(db.Query2(1));
+            Console.WriteLine("\nЗапрос 2 (Сборы реж. ID=15):");
+            Console.WriteLine(db.Query2(15));
 
             Console.WriteLine("\nЗапрос 3 (Фантастика Нолана):");
-            List<string> q3 = db.Query3("Фантастика", 
-                "Кристофер Нолан");
-            for (i = 0; i < q3.Count; i++)
+            q3 = db.Query3("Фантастика", "Кристофер Нолан");
+            for (index = 0; index < q3.Count; index++)
             {
-                Console.WriteLine(q3[i]);
+                Console.WriteLine(q3[index]);
             }
 
-            Console.WriteLine("\nЗапрос 4 (Средний бюджет Фантастики США):");
+            Console.WriteLine("\nЗапрос 4 (Ср. бюджет Фантастики США):");
             Console.WriteLine(db.Query4("Фантастика", "США"));
         }
     }

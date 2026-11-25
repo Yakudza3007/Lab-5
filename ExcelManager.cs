@@ -39,6 +39,45 @@ namespace ConsoleApp1
             return list;
         }
 
+        public List<Director> ReadDirectors()
+        {
+            List<Director> list = new List<Director>();
+            
+            using (XLWorkbook workbook = new XLWorkbook(_fileName))
+            {
+                IXLWorksheet sheet = workbook.Worksheet(2);
+                
+                foreach (IXLRow row in sheet.RowsUsed().Skip(1))
+                {
+                    int id = row.Cell(1).GetValue<int>();
+                    string name = row.Cell(2).GetValue<string>();
+                    string country = row.Cell(3).GetValue<string>();
+                    
+                    list.Add(new Director(id, name, country));
+                }
+            }
+            return list;
+        }
+
+        public List<Genre> ReadGenres()
+        {
+            List<Genre> list = new List<Genre>();
+            
+            using (XLWorkbook workbook = new XLWorkbook(_fileName))
+            {
+                IXLWorksheet sheet = workbook.Worksheet(3);
+                
+                foreach (IXLRow row in sheet.RowsUsed().Skip(1))
+                {
+                    int id = row.Cell(1).GetValue<int>();
+                    string name = row.Cell(2).GetValue<string>();
+                    
+                    list.Add(new Genre(id, name));
+                }
+            }
+            return list;
+        }
+
         public void SaveFilms(List<Film> films)
         {
             using (XLWorkbook workbook = new XLWorkbook(_fileName))
